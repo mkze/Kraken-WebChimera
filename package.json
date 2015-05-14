@@ -1,0 +1,22 @@
+{
+    "name": "kraken",
+    "main": "app://Kraken/main.html",
+    "window": {
+        "position": "center",
+        "toolbar": true,
+        "frame": true,
+        "title": "KRAKEN",
+        "resizable": true,
+        "min_width": 300,
+        "min_height": 200,
+        "width": 1024,
+        "height": 768
+    },
+    "dependencies": {
+        "twitch-irc": "latest"
+    },
+    "webkit": {
+        "plugin": true
+    },
+    "app-id": "com.mkze.kraken"
+}

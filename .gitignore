@@ -1,0 +1,12 @@
+# node modules
+node_modules/
+
+# css libs & font
+css/materialize.min.css
+font/
+
+# js libs
+js/lib/
+
+# WebChimera
+js/WebChimera/

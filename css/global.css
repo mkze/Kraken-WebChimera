@@ -1,0 +1,382 @@
+﻿
+/*
+    Kraken Player Global CSS
+    Mackenzie Nicholson
+    -
+    Overwrites some styles from Materialize CSS
+    Defines custom styles used within Kraken
+*/
+
+@font-face {
+    src: local("OpenSans"), url("/font/Open-Sans.woff");
+    font-family: OpenSans;
+}
+
+html,
+body {
+    background: #333;
+    color:#fff;
+    font-family:OpenSans;
+    font-size:small;
+    height:100%;
+    padding:0;
+    margin:0;
+    -webkit-user-select:none;
+    overflow:hidden;
+    /* -webkit-app-region: drag; */
+}
+
+/*
+button, a {
+  -webkit-app-region: no-drag;
+}
+*/
+
+.main-container {
+    display:flex;
+}
+
+fieldset,
+fieldset legend {
+    background-color:#1b1c1d;
+    border:none;
+}
+
+.hide {
+    display:none !important;
+}
+
+label {
+    -webkit-user-select: none;
+    user-select: none;
+}
+
+.stretch {
+    height:100%;
+    margin:0;
+    padding:0 !important;
+}
+
+.player-container {
+    width:100% !important;
+}
+
+.error-msg {
+    padding:10px 30px;
+}
+
+.clean-text {
+    text-transform:uppercase;
+    letter-spacing:0.05em;
+}
+
+
+/*
+    loading indicators
+*/
+.menu-loader {
+    background:rgba(0,0,0,0.5);
+    position:absolute;
+    left:0;
+    top:0;
+    height:100%;
+    width:calc(35em + 10px);
+}
+
+.preloader-wrapper.left-loader {
+    margin:10% 15.5em !important;
+    display:block !important;
+}
+
+.chat-loader {
+    background:rgba(0,0,0,0.5);
+    position:absolute;
+    right:10px;
+    top:0;
+    height:100%;
+    width:23em;
+}
+
+.preloader-wrapper.right-loader {
+    margin:10% 10em !important;
+    display:block !important;
+}
+
+/*Main Menu*/
+
+.main-menu {
+    max-width:35em;
+    min-width:35em;
+    background: #1b1c1d;
+    float:left;
+}
+
+.menu-toggle {
+    min-width:10px;
+    width:10px;
+    float:left;
+    left:0;
+    top:0;
+    margin:0;
+    padding:5px !important;
+    height:100%;
+    background:black;
+    cursor:pointer;
+    font-size:10px;
+}
+
+.menu-toggle > i {
+    left:0;
+    position:absolute;
+}
+
+/*
+    menu tabs
+*/
+.tabs {
+    background:transparent !important;
+}
+
+.tabs .indicator {
+  background-color:#e53935;
+  max-width:50%;
+}
+
+.tabs .tab a {
+    color:#555;
+}
+
+.tabs .tab .active,
+.tabs .tab a:hover {
+    color:#e53935;
+    border-bottom-color:#e53935;
+}
+
+.tab-follows {
+    margin-top:1em;
+}
+
+.tab-settings {
+    margin-top:2em;
+}
+
+/*
+    streams list
+*/
+.collection {
+    border:none;
+}
+
+.collection-item {
+      background:transparent !important;
+      border-bottom:#555 solid 1px !important;
+      height:auto !important;
+      font-size:1em !important;
+      padding-left:45px !important;
+      padding-top:5px !important;
+      padding-bottom:5px !important;
+      cursor:default;
+}
+
+.list-overflow {
+    overflow-x:hidden;
+    border-top:1px solid #555 !important;
+    height:calc(100% - 15em);
+}
+
+.list-overflow > .collection-item:last-child {
+    border-bottom:1px solid #555 !important;
+}
+
+.stream-online {
+    border-left:5px solid forestgreen;
+    cursor:pointer;
+}
+
+.stream-online:hover {
+    background:#222 !important;
+}
+
+.stream-online > .stream-name {
+    color:#e53935;
+}
+
+.stream-avatar {
+    width:2.5em !important;
+    height:2.5em !important;
+    padding:0 !important;
+    left:5px !important;
+}
+
+.stream-name {
+    font-size:small !important;
+    color:#e2e2e2;
+}
+
+
+/*
+     user inputs
+*/
+.username-search {
+   margin-top:1em;
+}
+
+input[type="text"]:focus,
+textarea:focus {
+    border-bottom:1px solid #e53935 !important;
+    box-shadow:0 1px 0 0 #e53935 !important;
+}
+input[type="text"]:focus+label,
+textarea:focus+label,
+.input-field > i.prefix.active {
+    color:#e53935 !important;
+}
+
+.oauth-input {
+    margin-top:-0.5em !important;
+}
+
+.input-indicator {
+    z-index:0;
+}
+
+.input-indicator:before {
+    content:attr(data-state);
+}
+
+/*
+   quality indicator text
+*/
+
+#qualityIndicator:before {
+    content:attr(data-content);
+}
+
+#selectQuality > li > a {
+    color:white;
+    background:#b71c1c;
+    font-size:small;    
+    text-transform:uppercase;
+    letter-spacing:0.05em;
+}
+
+#selectQuality > li > a:hover {
+    background:#d32f2f;
+}
+
+/*
+    Chat
+*/
+.chat-container {
+    float:right;
+    min-width:23em;
+    max-width:23em;
+    background:#222;
+    -webkit-user-select:text;
+}
+
+.chat-messages-container {
+    height:calc(100% - 10em);
+    border-top:solid 1px #999;
+}
+
+.chat-messages {
+    height:100%;
+    font-size:1em;
+    padding-bottom:10px;
+}
+
+.chat-lower-container {
+    display: block;
+    height: 100px;
+    border-top: 1px #aaa solid;
+}
+
+.chat-upper-container {
+    height:20px;
+    display:block;
+}
+
+.chat-textarea {
+    height: 60px !important;
+    width:280px;
+    display:block !important;
+    resize:none;
+    background:#333;
+    color:white !important;
+    border:1px #e53935 solid;
+    outline:none;
+    padding:0 !important;
+}
+
+.chat-textarea-label {
+    top:0 !important;
+}
+.chat-textarea-label.active {
+    display:none;
+}
+
+.chat-line {
+    padding:2px 5px;
+    line-height:20px;
+    word-wrap:break-word;
+}
+
+.chat-name {
+    cursor:pointer;
+    font-weight:bold;
+}
+
+.chat-text {
+    color:#aaa;
+    font-weight:normal;
+}
+
+.send-button {
+    margin:-8px 10px;
+    float:right;
+    height:25px;
+    line-height:25px;
+}
+
+.chat-options {
+    float:left;
+    margin:-8px 10px;
+    height:25px;
+    line-height:25px;
+}
+
+.emote-image {
+    margin-right:2px;
+    display:inline-block;
+    vertical-align:middle;
+}
+
+.chat-toggle {
+    min-width:10px;
+    width:10px;
+    float:right;
+    right:0;
+    top:0;
+    margin:0;
+    padding:5px !important;
+    height:100%;
+    background:black;
+    cursor:pointer;
+}
+
+.chat-toggle > i {
+    right:0;
+    position:absolute;
+}
+
+
+.chat-badge {
+    width:18px;
+    margin-right:2px;
+    transform:translateY(+25%);
+}
+
+#chatHeader {
+    color:#e53935;
+}

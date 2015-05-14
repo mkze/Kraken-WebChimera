@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<!--
+    mkze.ca
+-->
+
+<head>
+    <title>KRAKEN</title>
+    <link type="text/css" href="css/materialize.min.css" rel="stylesheet" />
+    <link type="text/css" href="css/global.css" rel="stylesheet" />
+    <script type="text/javascript" src="js/lib/jquery-1.11.1.min.js"></script>
+    <script type="text/javascript" src="js/lib/materialize.min.js"></script>
+    <script type="text/javascript" src="js/lib/jquery.nicescroll.min.js"></script>
+    <script type="text/javascript" src="js/lib/m3u-parser.min.js"></script>
+    <script type="text/javascript" src="js/WebChimera/player/webchimera.js"></script>
+</head>
+<body>
+
+    <div class="main-container stretch">
+        <div id="menuToggle" class="menu-toggle">
+            <i class="mdi-hardware-keyboard-arrow-left"></i>
+        </div>
+
+        <div id="mainMenu" class="main-menu stretch">
+            <div class="row stretch">
+
+                <div class="col s12">
+                    <ul class="tabs">
+                        <li class="tab">
+                            <a class="active" href="#followTab">Following</a>
+                        </li>
+                        <li class="tab">
+                            <a href="#settingTab">Settings</a>
+                        </li>
+                    </ul>
+                </div>
+
+                <div id="followTab" class="col s12 stretch tab-follows">
+                    <div id="inputFields" class="row">
+                        <div id="menuForm">
+                            <form id="usernameForm">
+                                <fieldset>
+                                    <div class="input-field col s8">
+                                        <i class="mdi-action-account-circle prefix username-icon"></i>
+                                        <input id="inputUsername" class="username-input" type="text">
+                                        <label for="inputUsername">Twitch Username</label>
+                                    </div>
+                                    <a id="btnGetUser" class="waves-effect waves-dark red darken-4 btn username-search">
+                                        <i class="mdi-action-search right"></i>Search
+                                    </a>
+                                </fieldset>
+                            </form>
+                            <div id="inputErrorField" class="card error-msg clear-text red darken-4" hidden>
+                                <div class="card-content white-text"></div>
+                            </div>
+                            <div class="divider"></div>
+                        </div>
+                    </div>
+
+                    <div class="row stretch">
+                        <div id="streamList" class="collection list-overflow"></div>
+                    </div>
+
+                </div>
+                <div id="settingTab" class="col s12 stretch tab-settings">
+                    <div class="row">
+                        <div class="col s4">
+                            <div class="clean-text">Stream Quality</div>
+                        </div>
+                        <div class="col s5 offset-s2">
+                            <a id="qualityIndicator" class='dropdown-button red darken-4 btn' data-activates='selectQuality'></a>
+                            <ul id="selectQuality" class="dropdown-content">
+                                <li><a value="chunked">Source</a></li>
+                                <li><a value="high">High</a></li>
+                                <li><a value="medium">Medium</a></li>
+                                <li><a value="low">Low</a></li>
+                                <li><a value="mobile">Mobile</a></li>
+                                <li><a value="audio_only">Audio Only</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col s4">
+                            <div class="clean-text">Desktop Notifications</div>
+                        </div>
+                        <div class="col s5 offset-s2">
+                            <div id="checkNotify">
+                                <a id="notifyIndicator" class="waves-effect waves-dark red darken-4 btn input-indicator"></a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col s4">
+                            <div class="clean-text">Chat</div>
+                        </div>
+                        <div class="col s5 offset-s2">
+                            <div id="checkChat">
+                                <a id="chatEnabled" class="waves-effect waves-dark red darken-4 btn input-indicator"></a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col s4">
+                            <div class="clean-text">Chat OAuth Token</div>
+                        </div>
+                        <div class="col s8 input-field oauth-input">
+                            <i class="mdi-action-lock prefix"></i>
+                            <input id="chatToken" class="input-oauth" type="text" autocomplete="off" />
+                            <label for="chatToken">OAuth Token</label>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="menuLoadIndicator" class="menu-loader" hidden>
+                    <div class="preloader-wrapper left-loader big active">
+                        <div class="spinner-layer spinner-blue-only">
+                            <div class="circle-clipper left">
+                                <div class="circle"></div>
+                            </div>
+                            <div class="gap-patch">
+                                <div class="circle"></div>
+                            </div>
+                            <div class="circle-clipper right">
+                                <div class="circle"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div id="menuLoadingText" class="center-align clean-text"></div>
+                </div>
+
+            </div>
+        </div>
+
+        <div id="playerContainer" class="player-container stretch"></div>
+
+        <div id="chatContainer" class="chat-container stretch">
+            <div class="chat-upper-container">
+                <div id="chatHeader" class="center-align clean-text"></div>
+            </div>
+            <div id="chatMessageContainer" class="chat-messages-container">
+                <div id="chatMessageList" class="chat-messages"></div>
+            </div>
+            <div id="chatControls" class="row chat-lower-container">
+                <div class="input-field col s12">
+                    <textarea id="chatMessageText" class="materialize-textarea chat-textarea" autocomplete="off"></textarea>
+                    <label for="chatMessageText" class="chat-textarea-label">Enter a message..</label>
+                </div>
+
+                <a id="btnSendChat" class="waves-effect waves-light red darken-4 btn send-button">
+                    <i class="mdi-content-send right"></i>Send
+                </a>
+
+                <a class="btn waves-effect waves-light red darken-4 chat-options">
+                    <i class="tiny mdi-action-settings"></i>
+                </a>
+            </div>
+
+            <div id="chatLoadIndicator" class="chat-loader" hidden>
+                <div class="preloader-wrapper right-loader big active">
+                    <div class="spinner-layer spinner-blue-only">
+                        <div class="circle-clipper left">
+                            <div class="circle"></div>
+                        </div>
+                        <div class="gap-patch">
+                            <div class="circle"></div>
+                        </div>
+                        <div class="circle-clipper right">
+                            <div class="circle"></div>
+                        </div>
+                    </div>
+                </div>
+                <div id="chatLoadingText" class="center-align clean-text"></div>
+            </div>
+
+        </div>
+
+        <div id="chatToggle" class="chat-toggle">
+            <i class="mdi-hardware-keyboard-arrow-right"></i>
+        </div>
+
+    </div>
+
+    <script type="text/javascript" src="js/Kraken/Core.js"></script>
+    <script type="text/javascript" src="js/Kraken/Player.js"></script>
+    <script type="text/javascript" src="js/Kraken/Chat.js"></script>
+    <script type="text/javascript" src="js/Kraken/API.js"></script>
+    <script type="text/javascript" src="js/Kraken/Utils.js"></script>
+
+</body>
+</html>
