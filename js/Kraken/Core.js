@@ -8,7 +8,6 @@ Kraken = {
     Username: null,
     Streams: [],
     StaleStreams: [],
-    FollowingCount: 0,
     CurrentStream: null,
     RefreshTimeout: null,
     IdleTimeout: null,
@@ -20,11 +19,12 @@ Kraken = {
         EmoteBase: "http://static-cdn.jtvnw.net/emoticons/v1/"
     },
     Elements: {
-        menuLoadIndicator: $("#menuLoadIndicator"),
-        chatLoadIndicator: $("#chatLoadIndicator"),
-        streamList: $("#streamList"),
-        userButton: $("#btnGetUser"),
-        chatFrame: $("#chatFrame"),
+        menuLoadIndicator: document.getElementById("menuLoadIndicator"),
+        chatLoadIndicator: document.getElementById("chatLoadIndicator"),
+        inputUsername: document.getElementById("inputUsername"),
+        userButton: document.getElementById("btnGetUser"),
+        streamList: document.getElementById("streamList"),
+        errorField: document.getElementById("errorField"),
         isMenuOpen: true
     },
 
@@ -59,7 +59,7 @@ Kraken = {
 };
 
 
-$(function () {
+document.addEventListener("DOMContentLoaded", function () {
 
     Kraken.Initialize();
 

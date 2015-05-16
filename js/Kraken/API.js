@@ -4,70 +4,66 @@
 Kraken.API = {
 
     GetUser: function () {
+        
+        Kraken.Utils.GetJSONP(Kraken.URL.APIBase + "kraken/users/" + Kraken.Username + "/follows/channels?limit=100", function (data) {
 
-        $.ajax({
-            type: "GET",
-            dataType: "jsonp",
-            url: Kraken.URL.APIBase + "kraken/users/" + Kraken.Username + "/follows/channels?limit=100",
-            success: function (data) {
-                    
-                if (data.error) {
-                    Kraken.Utils.DisplayError(data.error + ": " + data.message);
-                }
+            if (data.error) {
+                Kraken.Utils.DisplayError(data.error + ": " + data.message);
+                return;
+            }
 
-                else if (data.follows.length == 0) {
-                    Kraken.Utils.DisplayError("User is not currently following any channels");
-                }
-                else {
-                    Kraken.Streams = data.follows;
-                    Kraken.FollowingCount = data._total;
-                    Kraken.API.GetOnlineData();
-                }
-            },
-            error: function () {
+            else if (data.follows.length == 0) {
+                Kraken.Utils.DisplayError("User is not currently following any channels");
+            }
+            else if(data.follows) {
+                Kraken.Streams = data.follows;
+                Kraken.FollowingCount = data._total;
+                Kraken.API.GetOnlineData();
+            }
+            else {
                 Kraken.Utils.DisplayError("Error retrieving User data from the Twitch API.");
             }
+
         });
+
     },
 
     GetOnlineData: function () {
 
         var query = Kraken.Utils.GetChannelString();
 
-        $.ajax({
-            type: "GET",
-            dataType: "jsonp",
-            url: Kraken.URL.APIBase + "kraken/streams/" + query,
-            success: function (data) {
-                data.streams.forEach(function (streamData) {
+        Kraken.Utils.GetJSONP(Kraken.URL.APIBase + "kraken/streams/" + query, function(data) {
 
-                    Kraken.Streams.forEach(function (channelData) {
+            if (!data.streams) {
+                Kraken.Utils.DisplayError("Could not retrieve channel stream data from the Twitch API.");
+                return;
+            }
 
-                        if (channelData.channel.name == streamData.channel.name)
-                            channelData.stream = streamData;
-                    })
-                });
+            data.streams.forEach(function (streamData) {
 
-                Kraken.Elements.menuLoadIndicator.hide();
-                Kraken.Utils.BuildList();
+                Kraken.Streams.forEach(function (channelData) {
 
-                if (Kraken.StaleStreams.length > 0 && Kraken.Settings.ShouldNotify) {
-                    for (var i = 0; i < Kraken.Streams.length; i++) {
-                        if (!Kraken.StaleStreams[i].stream && Kraken.Streams[i].stream) {
-                            var notification = new Notification("Kraken Alert", { body: Kraken.Streams[i].channel.display_name + " is live" });
-                        }
+                    if (channelData.channel.name == streamData.channel.name)
+                        channelData.stream = streamData;
+                })
+            });
+
+            Kraken.Elements.menuLoadIndicator.style.display = "none";
+            Kraken.Utils.BuildList();
+
+            if (Kraken.StaleStreams.length > 0 && Kraken.Settings.ShouldNotify) {
+                for (var i = 0; i < Kraken.Streams.length; i++) {
+                    if (!Kraken.StaleStreams[i].stream && Kraken.Streams[i].stream) {
+                        var notification = new Notification("Kraken Alert", { body: Kraken.Streams[i].channel.display_name + " is live" });
                     }
                 }
-            },
-            error: function () {
-                Kraken.Utils.DisplayError("Could not retrieve Channel Stream data from the Twitch API.");
             }
         });
     },
 
     GetLiveToken: function (channel) {
 
-        Kraken.Elements.menuLoadIndicator.show();
+        Kraken.Elements.menuLoadIndicator.style.display = "block";
 
         Kraken.Modules.HTTPS.get(Kraken.URL.APIBase + "api/channels/" + channel + "/access_token", function (res) {
             var response = "";
@@ -77,19 +73,19 @@ Kraken.API = {
             });
 
             res.on('end', function () {
-                Kraken.Elements.menuLoadIndicator.hide();
+                Kraken.Elements.menuLoadIndicator.style.display = "none";
                 Kraken.API.GetHLSLinks(JSON.parse(response), channel);
             });
         }).on('error', function (e) {
             Kraken.Utils.DisplayError("Error retrieving stream access token: " + e.message);
-        });;
+        });
 
 
     },
 
     GetHLSLinks: function (access, name) {
 
-        Kraken.Elements.menuLoadIndicator.show();
+        Kraken.Elements.menuLoadIndicator.style.display = "block";
 
         Kraken.Modules.HTTP.get(Kraken.URL.UsherBase + "api/channel/hls/" + name + ".m3u8?allow_source=true&allow_audio_only=true&type=any&private_code=null&player=twitchweb" + "&token=" + access.token.toString() + "&sig=" + access.sig + "&p=0420420", function (res) {
             var response = "";
@@ -99,7 +95,7 @@ Kraken.API = {
             });
 
             res.on('end', function () {
-                Kraken.Elements.menuLoadIndicator.hide();
+                Kraken.Elements.menuLoadIndicator.style.display = "none";
                 var playlist = M3U.parse(response);
                 var hls;
                 var chunked;

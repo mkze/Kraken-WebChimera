@@ -17,7 +17,14 @@ Kraken.Chat = {
     },
     MessageCount: 0,
     Elements: {
-        MessageList: $("#chatMessageList"),
+        MessageList: document.getElementById("chatMessageList"),
+        ChatLoadingText: document.getElementById("chatLoadingText"),
+        ChatContainer: document.getElementById("chatContainer"),
+        ChatToggle: document.getElementById("chatToggle"),
+        ChatEnabled: document.getElementById("chatEnabled"),
+        ButtonSendChat: document.getElementById("btnSendChat"),
+        ChatMessageText: document.getElementById("chatMessageText"),
+        ChatToken: document.getElementById("chatToken"),
         isChatOpen: true
     },
     Settings: {
@@ -27,74 +34,70 @@ Kraken.Chat = {
 
     GetEmoteData: function() {
 
-        Kraken.Elements.chatLoadIndicator.show();
-        $("#chatLoadingText").text("Retrieving emote data...");
+        Kraken.Elements.chatLoadIndicator.style.display = "block";
+        Kraken.Chat.Elements.ChatLoadingText.textContent = "Retrieving emote data...";
 
-        $.ajax({
-            url: "https://api.twitch.tv/kraken/chat/emoticon_images",
-            dataType: "jsonp",
-            success: function (data) {
-
+        Kraken.Utils.GetJSONP("https://api.twitch.tv/kraken/chat/emoticon_images", function (data) {
+            if (data) {
                 data.emoticons.forEach(function (emoticon) {
                     Kraken.Chat.Emotes.Twitch[emoticon.id] = { code: emoticon.code, emoticon_set: emoticon.emoticon_set };
                 });
-
-                $.ajax({
-                    url: "https://api.betterttv.net/emotes",
-                    success: function (data) {
-                        Kraken.Chat.Emotes.BTTV = data;
-                        Kraken.Elements.chatLoadIndicator.hide();
-                        localStorage.setItem("TwitchEmoteData", JSON.stringify(Kraken.Chat.Emotes));
-                    },
-                    error: function () {
-
-                    }
-                });
-            },
-            error: function () {
-
             }
-        })
+
+            Kraken.Modules.HTTPS.get("https://api.betterttv.net/emotes", function (res) {
+
+                var response = "";
+
+                res.on('data', function (chunk) {
+                    response += chunk;
+                });
+
+                res.on('end', function () {
+                    Kraken.Chat.Emotes.BTTV = JSON.parse(response);
+                    Kraken.Elements.chatLoadIndicator.style.display = "none";
+                    localStorage.setItem("TwitchEmoteData", JSON.stringify(Kraken.Chat.Emotes));
+                });
+            }).on('error', function (e) {
+                Kraken.Utils.DisplayError("Error retrieving BTTV emotes: " + e.message);
+            });
+
+        });
     },
 
     Initialize: function (channel) {
 
-        Kraken.Elements.chatLoadIndicator.show();
-        $("#chatLoadingText").text("Connecting to #" + channel);
+        Kraken.Elements.chatLoadIndicator.style.display = "block";
+        Kraken.Chat.Elements.ChatLoadingText.textContent = "Connecting to #" + channel;
         Kraken.CurrentStream = channel;
 
         if (Kraken.Chat.Client) {
             Kraken.Chat.Client.disconnect();
-            Kraken.Chat.Elements.MessageList.empty();
+            Kraken.Chat.Elements.MessageList.innerHTML = "";
             Kraken.Chat.MessageCount = 0;
         }
 
-        $.ajax({
-            url: "https://api.twitch.tv/kraken/chat/"+ channel +"/badges",
-            dataType: "jsonp",
-            success: function (data) {
-                Kraken.Chat.Emotes.Badges = data;
-                Kraken.Chat.IRCOptions.channels = [channel];
+        Kraken.Utils.GetJSONP("https://api.twitch.tv/kraken/chat/"+ channel +"/badges", function(data) {
+            Kraken.Chat.Emotes.Badges = data;
+            Kraken.Chat.IRCOptions.channels = [channel];
 
-                if (Kraken.Chat.OAuthToken) {
-                    Kraken.Chat.IRCOptions.identity = {
-                        username: Kraken.Username,
-                        password: Kraken.Chat.OAuthToken
-                    }
+            if (Kraken.Chat.OAuthToken) {
+                Kraken.Chat.IRCOptions.identity = {
+                    username: Kraken.Username,
+                    password: Kraken.Chat.OAuthToken
                 }
-
-                Kraken.Chat.Client = new Kraken.Modules.IRC.client(Kraken.Chat.IRCOptions);
-                Kraken.Chat.AddIRCHandlers(channel);
-                Kraken.Chat.Client.connect();
-            },
-            error: function () {
-                Kraken.Utils.DisplayError("Failed to retrieve subscriber badges via Twitch API..");
             }
-        })
+
+            Kraken.Chat.Client = new Kraken.Modules.IRC.client(Kraken.Chat.IRCOptions);
+            Kraken.Chat.AddIRCHandlers(channel);
+            Kraken.Chat.Client.connect();
+        });
+
     },
 
     OpenChat: function () {
-        $("#chatContainer, #chatToggle").show();
+        Kraken.Chat.Elements.ChatContainer.style.display = "block";
+        Kraken.Chat.Elements.ChatToggle.style.display = "block";
+
         if (Kraken.CurrentStream) {
 
             if (Kraken.Chat.Client && Kraken.Chat.Client.connected) {
@@ -107,8 +110,15 @@ Kraken.Chat = {
         }
     },
 
-    SystemMessage: function(message) {
-        Kraken.Chat.Elements.MessageList.append("<div><span>" + message + "</span></div>");
+    SystemMessage: function (message) {
+
+        var div = document.createElement("div");
+        var span = document.createElement("span");
+
+        span.textContent = message;
+        div.appendChild(span);
+
+        Kraken.Chat.Elements.MessageList.appendChild(div);
         Kraken.Chat.ScrollToBottom();
     },
 
@@ -159,7 +169,7 @@ Kraken.Chat = {
 
     ScrollToBottom: function() {
         if (Kraken.Chat.Settings.ScrollLock) {
-            Kraken.Chat.Elements.MessageList.scrollTop(Kraken.Chat.Elements.MessageList[0].scrollHeight);
+            Kraken.Chat.Elements.MessageList.scrollTop = Kraken.Chat.Elements.MessageList.scrollHeight;
         }
     },
 
@@ -168,7 +178,7 @@ Kraken.Chat = {
         message = Kraken.Utils.EscapeHTML(message);
         message = Kraken.Chat.ReplaceBTTVEmotes(message);
 
-        if (!$.isEmptyObject(user.emote)) {
+        if (Object.keys(user.emote).length != 0) {
 
             var emoteIDs = [];
             for (var id in user.emote) {
@@ -178,45 +188,47 @@ Kraken.Chat = {
             message = Kraken.Chat.ReplaceEmotes(message, emoteIDs);
         }
 
-        Kraken.Chat.Elements.MessageList.append(
+        Kraken.Chat.Elements.MessageList.innerHTML += 
             "<div class='chat-line'>" +
-             user.Badges +
-            "<span class='chat-name' style='color:" + user.color + "'>" + user.username + "</span>" +
-            "<span>: </span>" +
-            "<span class='chat-text'>" + message + "</span>" +
-            "</div>");
+                 user.Badges +
+                "<span class='chat-name' style='color:" + user.color + "'>" + user.username + "</span>" +
+                "<span>: </span>" +
+                "<span class='chat-text'>" + message + "</span>" +
+            "</div>";
 
         Kraken.Chat.MessageCount++;
 
         if (Kraken.Chat.MessageCount > 150) {
-            $("#chatMessageList div").first().remove();
+            Kraken.Chat.Elements.MessageList.removeChild(Kraken.Chat.Elements.MessageList.firstChild);
         }
 
-        $(".chat-name").last().click(function () {
-            var existingText = $("#chatMessageText").val();
-            if (existingText && existingText != "") {
-                $("#chatMessageText").val(existingText + " @" + $(this).text());
-            } else {
-                $("#chatMessageText").val("@" + $(this).text() + " ");
-            }
-            $("#chatMessageText").focus();
-        });
+        //$(".chat-name").last().click(function () {
+        //    var chatMessageText = document.getElementById("chatMessageText");
+        //    var existingText = chatMessageText.value;
 
-        $("#chatMessageList").getNiceScroll().resize();
+        //    if (existingText && existingText != "") {
+        //        chatMessageText.value = existingText + " @" + $(this).text();
+        //    } else {
+        //        chatMessageText.value = "@" + $(this).text() + " ";
+        //    }
+        //    chatMessageText.focus();
+        //});
+
         Kraken.Chat.ScrollToBottom();
     },
 
     AddIRCHandlers: function (channel) {
 
         Kraken.Chat.Client.addListener('connected', function (address, port) {
-            Kraken.Elements.chatLoadIndicator.hide();
-            $("#chatHeader").text(channel);
+            Kraken.Elements.chatLoadIndicator.style.display = "none";
+            document.getElementById("chatHeader").textContent = channel;
         });
         Kraken.Chat.Client.addListener('connectfail', function () {
-            Kraken.Elements.chatLoadIndicator.hide();
+            Kraken.Elements.chatLoadIndicator.style.display = "none";
             Kraken.Chat.SystemMessage("Failed to connect to #" + channel);
         });
         Kraken.Chat.Client.addListener('chat', Kraken.Chat.MessageRecieved);
+
         Kraken.Chat.Client.addListener('subscription', function (channel, username) {
             Kraken.Chat.SystemMessage(username + " has just subscribed!");
         });
@@ -235,8 +247,8 @@ Kraken.Chat = {
             }
         });
         Kraken.Chat.Client.addListener('clearchat', function (channel) {
-            Kraken.Chat.Elements.MessageList.empty();
-            Kraken.Chat.SystemMessage("Chat was cleared");
+            Kraken.Chat.Elements.MessageList.innerHTML = "";
+            Kraken.Chat.SystemMessage("Chat was cleared by a moderator");
         });
         Kraken.Chat.Client.addListener('crash', function (message, stack) {
             Kraken.Chat.SystemMessage("Oh No! Twitch-IRC crashed at " + stack + ": " + message);
@@ -245,18 +257,19 @@ Kraken.Chat = {
             Kraken.Chat.SystemMessage("Disconnected from #" + channel + " due to " + reason);
         });
         Kraken.Chat.Client.addListener('reconnect', function (reason) {
-            Kraken.Elements.chatLoadIndicator.show();
-            $("#chatLoadingText").text("Reconnecting to #" + channel);
+            Kraken.Elements.chatLoadIndicator.style.display = "block";
+            Kraken.Chat.Elements.ChatLoadingText.textContent = "Reconnecting to #" + channel;
         });
     },
 
     SetEnabledState: function() {
         if (Kraken.Chat.Settings.Enabled) {
-            $("#chatEnabled").attr("data-state", "enabled");
+            Kraken.Chat.Elements.ChatEnabled.setAttribute("data-state", "enabled");
             Kraken.Chat.OpenChat();
         } else {
-            $("#chatContainer, #chatToggle").hide();
-            $("#chatEnabled").attr("data-state", "disabled");
+            Kraken.Chat.Elements.ChatContainer.style.display = "none";
+            Kraken.Chat.Elements.ChatToggle.style.display = "none";
+            Kraken.Chat.Elements.ChatEnabled.setAttribute("data-state", "disabled");
             if (Kraken.Chat.Client && Kraken.Chat.Client.connected) {
                 Kraken.Chat.Client.disconnect();
             }
@@ -265,22 +278,27 @@ Kraken.Chat = {
 
     AddEventHandlers: function () {
 
-        $("#chatToggle").click(function () {
+        document.getElementById("chatToggle").addEventListener("click", function () {
 
             Kraken.Chat.Elements.isChatOpen = !Kraken.Chat.Elements.isChatOpen;
 
-            $("#chatContainer").toggle();
-            $("#chatToggle > i").toggleClass("mdi-hardware-keyboard-arrow-left mdi-hardware-keyboard-arrow-right")
+            var chat = document.getElementById("chatContainer");
+            var displayStyle = Kraken.Chat.Elements.isChatOpen ? "block" : "none";
+            chat.style.display = displayStyle;
+
+            var toggleIndicator = document.querySelector("#chatToggle > i");
+            toggleIndicator.classList.toggle("mdi-hardware-keyboard-arrow-left");
+            toggleIndicator.classList.toggle("mdi-hardware-keyboard-arrow-right");
         });
 
-        $("#checkChat").click(function () {
+        document.getElementById("checkChat").addEventListener("click", function () {
             Kraken.Chat.Settings.Enabled = !Kraken.Chat.Settings.Enabled;
             localStorage.setItem("ChatEnabled", Kraken.Chat.Settings.Enabled);
 
             Kraken.Chat.SetEnabledState();
         });
 
-        $("#chatMessageList").scroll(function (e) {
+        Kraken.Chat.Elements.MessageList.addEventListener("scroll", function (e) {
             if ((e.currentTarget.scrollHeight - e.currentTarget.scrollTop) <= (e.currentTarget.clientHeight * 1.25)) {
                 Kraken.Chat.Settings.ScrollLock = true;
             } else {
@@ -288,9 +306,9 @@ Kraken.Chat = {
             }
         });
 
-        $("#chatToken").change(function () {
+        Kraken.Chat.Elements.ChatToken.addEventListener("change", function () {
 
-            var value = $(this).val();
+            var value = this.value;
 
             if (value && value != "") {
                 Kraken.Chat.OAuthToken = value;
@@ -301,21 +319,21 @@ Kraken.Chat = {
             }
         });
 
-        //$("#btnSendChat").click(function () {
+        Kraken.Chat.Elements.ButtonSendChat.addEventListener("click", function () {
 
-        //    if (Kraken.Chat.Client && Kraken.Chat.Client.connected && (Kraken.Chat.Client.myself == Kraken.Username)) {
-        //        var msg = $("#chatMessageText").val();
-        //        if (msg && msg != "") {                    
-        //            Kraken.Chat.Client.say(Kraken.CurrentStream, msg).then(function () {
-        //                Kraken.Chat.AddChatMessage(Kraken.Username, msg);
-        //                $("#chatMessageText").val("");
-        //            });
-        //        }
-        //    }
-        //});
+            if (Kraken.Chat.Client && Kraken.Chat.Client.connected && (Kraken.Chat.Client.myself == Kraken.Username)) {
+                var msg = Kraken.Chat.Elements.ChatMessageText.value;
+                if (msg && msg != "") {                    
+                    Kraken.Chat.Client.say(Kraken.CurrentStream, msg).then(function () {
+                        Kraken.Chat.AddChatMessage(Kraken.Username, msg);
+                        Kraken.Chat.Elements.ChatMessageText.value = "";
+                    });
+                }
+            }
+        });
 
-        $('#chatMessageText').keypress(function (e) {
-            if (e.keyCode == 13) $("#btnSendChat").click();
+        document.getElementById('chatMessageText').addEventListener("keypress", function (e) {
+            if (e.keyCode == 13) Kraken.Chat.Elements.ButtonSendChat.click();
         })
 
     },
@@ -330,15 +348,10 @@ Kraken.Chat = {
         }
 
         if (Kraken.Chat.OAuthToken != null) {
-            $("#chatToken").val(Kraken.Chat.OAuthToken);
+            Kraken.Chat.Elements.ChatToken.value = Kraken.Chat.OAuthToken;
         }
 
         Kraken.Chat.SetEnabledState();
-
-        $("#chatMessageList, .chat-textarea").niceScroll({
-            autohidemode:"none",
-            cursorwidth: "1px",
-        });
 
         if (localStorage.getItem("TwitchEmoteData") == null) {
             Kraken.Chat.GetEmoteData();
