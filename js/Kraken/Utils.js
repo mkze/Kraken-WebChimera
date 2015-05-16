@@ -242,6 +242,8 @@ Kraken.Utils = {
 
         if (Kraken.Username) {
             Kraken.Elements.inputUsername.value = Kraken.Username;
+            Kraken.Elements.inputUsername.nextElementSibling.classList.add("active");
+            Kraken.Elements.inputUsername.previousElementSibling.classList.add("active");
             Kraken.Elements.menuLoadIndicator.style.display = "block";
             Kraken.API.GetUser();
         }
