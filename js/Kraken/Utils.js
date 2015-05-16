@@ -240,12 +240,8 @@ Kraken.Utils = {
             Kraken.Settings.ShouldNotify = true;
         }
 
-        //materialize needs jQuery
-        $('ul.tabs').tabs();
-
         if (Kraken.Username) {
             Kraken.Elements.inputUsername.value = Kraken.Username;
-            Kraken.Elements.inputUsername.focus();
             Kraken.Elements.menuLoadIndicator.style.display = "block";
             Kraken.API.GetUser();
         }
