@@ -15,7 +15,6 @@ Kraken.Chat = {
         Twitch: {},
         BTTV: {}
     },
-    MessageCount: 0,
     Elements: {
         MessageList: document.getElementById("chatMessageList"),
         ChatLoadingText: document.getElementById("chatLoadingText"),
@@ -73,7 +72,6 @@ Kraken.Chat = {
         if (Kraken.Chat.Client) {
             Kraken.Chat.Client.disconnect();
             Kraken.Chat.Elements.MessageList.innerHTML = "";
-            Kraken.Chat.MessageCount = 0;
         }
 
         Kraken.Utils.GetJSONP("https://api.twitch.tv/kraken/chat/"+ channel +"/badges", function(data) {
@@ -145,7 +143,7 @@ Kraken.Chat = {
             }
 
             if (msg.match(regex)) {
-                msg = msg.replace(regex, "<img class='emote-image' src='" + Kraken.URL.EmoteBase + id + "/1.0" + "'/>");
+                msg = msg.replace(regex, "<img onload='Kraken.Chat.ScrollToBottom' class='emote-image' src='" + Kraken.URL.EmoteBase + id + "/1.0" + "'/>");
             }
 
         });
@@ -196,23 +194,9 @@ Kraken.Chat = {
                 "<span class='chat-text'>" + message + "</span>" +
             "</div>";
 
-        Kraken.Chat.MessageCount++;
-
-        if (Kraken.Chat.MessageCount > 150) {
+        while (Kraken.Chat.Elements.MessageList.children.length > 150 && Kraken.Chat.Settings.ScrollLock) {
             Kraken.Chat.Elements.MessageList.removeChild(Kraken.Chat.Elements.MessageList.firstChild);
         }
-
-        //$(".chat-name").last().click(function () {
-        //    var chatMessageText = document.getElementById("chatMessageText");
-        //    var existingText = chatMessageText.value;
-
-        //    if (existingText && existingText != "") {
-        //        chatMessageText.value = existingText + " @" + $(this).text();
-        //    } else {
-        //        chatMessageText.value = "@" + $(this).text() + " ";
-        //    }
-        //    chatMessageText.focus();
-        //});
 
         Kraken.Chat.ScrollToBottom();
     },
