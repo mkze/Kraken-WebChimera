@@ -6,8 +6,7 @@ Kraken.Chat = {
     OAuthToken: null,
     IRCOptions: {
         options: {
-            debug: false,
-            debugIgnore: ['ping', 'chat', 'action']
+            emitSelf: true
         }
     },
     Client: null,
@@ -323,7 +322,6 @@ Kraken.Chat = {
                 var msg = Kraken.Chat.Elements.ChatMessageText.value;
                 if (msg && msg != "") {                    
                     Kraken.Chat.Client.say(Kraken.CurrentStream, msg).then(function () {
-                        Kraken.Chat.AddChatMessage(Kraken.Username, msg);
                         Kraken.Chat.Elements.ChatMessageText.value = "";
                     });
                 }
