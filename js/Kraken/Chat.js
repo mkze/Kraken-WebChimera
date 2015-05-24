@@ -186,17 +186,31 @@ Kraken.Chat = {
             message = Kraken.Chat.ReplaceEmotes(message, emoteIDs);
         }
 
-        Kraken.Chat.Elements.MessageList.innerHTML += 
+        Kraken.Chat.Elements.MessageList.insertAdjacentHTML("beforeend", 
             "<div class='chat-line'>" +
                  user.Badges +
                 "<span class='chat-name' style='color:" + user.color + "'>" + user.username + "</span>" +
                 "<span>: </span>" +
                 "<span class='chat-text'>" + message + "</span>" +
-            "</div>";
+            "</div>");
 
         while (Kraken.Chat.Elements.MessageList.children.length > 150 && Kraken.Chat.Settings.ScrollLock) {
             Kraken.Chat.Elements.MessageList.removeChild(Kraken.Chat.Elements.MessageList.firstChild);
         }
+
+        var lastMessage = Kraken.Chat.Elements.MessageList.lastChild.querySelector(".chat-name");
+        lastMessage.addEventListener("click", function () {
+            var chatMessageText = Kraken.Chat.Elements.ChatMessageText;
+            var existingText = chatMessageText.value;
+
+            if (existingText && existingText != "") {
+                chatMessageText.value = existingText + " @" + this.textContent;
+            } else {
+                chatMessageText.value = "@" + this.textContent + " ";
+            }
+
+            chatMessageText.focus();
+        });
 
         Kraken.Chat.ScrollToBottom();
     },
