@@ -27,9 +27,10 @@ Kraken.Utils = {
         var itemArray = Array.prototype.slice.call(items, 0);
 
         itemArray.sort(function (first) {
-            if (!first.classList.contains("stream-online")) {
+            if (!first.classList.contains("stream-online")) 
                 return 1;
-            }
+            else
+                return -1;
         });
 
         itemArray.forEach(function (item) {

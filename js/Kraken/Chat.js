@@ -97,11 +97,8 @@ Kraken.Chat = {
 
         if (Kraken.CurrentStream) {
 
-            if (Kraken.Chat.Client && Kraken.Chat.Client.connected) {
-
-                if (Kraken.Chat.Client.currentChannels[0] == Kraken.CurrentStream) {
-                    return;
-                }
+            if ((Kraken.Chat.Client && Kraken.Chat.Client.connected) && (Kraken.Chat.Client.currentChannels[0] == Kraken.CurrentStream)) {
+                return;
             }
             Kraken.Chat.Initialize(Kraken.CurrentStream);
         }
@@ -122,6 +119,19 @@ Kraken.Chat = {
     MessageRecieved: function (channel, user, message) {
 
         user.Badges = "";
+        message = Kraken.Utils.EscapeHTML(message);
+        message = Kraken.Chat.ReplaceBTTVEmotes(message);
+
+        if (Object.keys(user.emote).length != 0) {
+
+            var emoteIDs = [];
+            for (var id in user.emote) {
+                emoteIDs.push(id);
+            }
+
+            message = Kraken.Chat.ReplaceEmotes(message, emoteIDs);
+        }
+
         if (user.special) {
             user.special.forEach(function (type) {
                 user.Badges += "<img class='chat-badge' src='" + Kraken.Chat.Emotes.Badges[type].image + "'/>";
@@ -171,19 +181,6 @@ Kraken.Chat = {
     },
 
     AddChatMessage: function (user, message) {
-
-        message = Kraken.Utils.EscapeHTML(message);
-        message = Kraken.Chat.ReplaceBTTVEmotes(message);
-
-        if (Object.keys(user.emote).length != 0) {
-
-            var emoteIDs = [];
-            for (var id in user.emote) {
-                emoteIDs.push(id);
-            }
-
-            message = Kraken.Chat.ReplaceEmotes(message, emoteIDs);
-        }
 
         Kraken.Chat.Elements.MessageList.insertAdjacentHTML("beforeend", 
             "<div class='chat-line'>" +
