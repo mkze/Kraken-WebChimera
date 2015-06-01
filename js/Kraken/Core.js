@@ -4,7 +4,7 @@
 var Kraken = Kraken || {};
 
 Kraken = {
-    
+
     Username: null,
     Streams: [],
     StaleStreams: [],
@@ -14,7 +14,7 @@ Kraken = {
     URL: {
         Base: "http://twitch.tv/",
         APIBase: "https://api.twitch.tv/",
-        UsherBase:"http://usher.twitch.tv/",
+        UsherBase: "http://usher.twitch.tv/",
         DefaultProfileImage: "http://static-cdn.jtvnw.net/jtv_user_pictures/xarth/404_user_150x150.png",
         EmoteBase: "http://static-cdn.jtvnw.net/emoticons/v1/"
     },

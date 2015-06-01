@@ -3,8 +3,7 @@
 
 Kraken.Utils = {
 
-    //escape html courtesy of mustache.js
-    EscapeHTML: function(string) {
+    EscapeHTML: function (string) {
         return String(string).replace(/[&<>"'\/]/g, function (s) {
             return Kraken.HTMLEntities[s];
         });
@@ -27,7 +26,7 @@ Kraken.Utils = {
         var itemArray = Array.prototype.slice.call(items, 0);
 
         itemArray.sort(function (first) {
-            if (!first.classList.contains("stream-online")) 
+            if (!first.classList.contains("stream-online"))
                 return 1;
             else
                 return -1;
@@ -142,7 +141,7 @@ Kraken.Utils = {
         notifyIndicator.setAttribute("data-state", state);
     },
 
-    GetJSONP: function(url, callback) {
+    GetJSONP: function (url, callback) {
         var handle = "_jsonp_" + Math.floor(Math.random() * 10000);
 
         var jsonp = document.createElement('script');
@@ -207,11 +206,11 @@ Kraken.Utils = {
 
         document.getElementById("menuToggle").addEventListener("click", function () {
             Kraken.Elements.isMenuOpen = !Kraken.Elements.isMenuOpen;
-            
+
             var menu = document.getElementById("mainMenu");
             var displayStyle = Kraken.Elements.isMenuOpen ? "block" : "none";
             menu.style.display = displayStyle;
-            
+
             var toggleIndicator = document.querySelector("#menuToggle > i");
             toggleIndicator.classList.toggle("mdi-hardware-keyboard-arrow-left");
             toggleIndicator.classList.toggle("mdi-hardware-keyboard-arrow-right");

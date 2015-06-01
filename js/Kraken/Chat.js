@@ -30,7 +30,7 @@ Kraken.Chat = {
         ScrollLock: true
     },
 
-    GetEmoteData: function() {
+    GetEmoteData: function () {
 
         Kraken.Elements.chatLoadIndicator.style.display = "block";
         Kraken.Chat.Elements.ChatLoadingText.textContent = "Retrieving emote data...";
@@ -73,7 +73,7 @@ Kraken.Chat = {
             Kraken.Chat.Elements.MessageList.innerHTML = "";
         }
 
-        Kraken.Utils.GetJSONP("https://api.twitch.tv/kraken/chat/"+ channel +"/badges", function(data) {
+        Kraken.Utils.GetJSONP("https://api.twitch.tv/kraken/chat/" + channel + "/badges", function (data) {
             Kraken.Chat.Emotes.Badges = data;
             Kraken.Chat.IRCOptions.channels = [channel];
 
@@ -174,7 +174,7 @@ Kraken.Chat = {
         return msg;
     },
 
-    ScrollToBottom: function() {
+    ScrollToBottom: function () {
         if (Kraken.Chat.Settings.ScrollLock) {
             Kraken.Chat.Elements.MessageList.scrollTop = Kraken.Chat.Elements.MessageList.scrollHeight;
         }
@@ -182,7 +182,7 @@ Kraken.Chat = {
 
     AddChatMessage: function (user, message) {
 
-        Kraken.Chat.Elements.MessageList.insertAdjacentHTML("beforeend", 
+        Kraken.Chat.Elements.MessageList.insertAdjacentHTML("beforeend",
             "<div class='chat-line'>" +
                  user.Badges +
                 "<span class='chat-name' style='color:" + user.color + "'>" + user.username + "</span>" +
@@ -256,7 +256,7 @@ Kraken.Chat = {
         });
     },
 
-    SetEnabledState: function() {
+    SetEnabledState: function () {
         if (Kraken.Chat.Settings.Enabled) {
             Kraken.Chat.Elements.ChatEnabled.setAttribute("data-state", "enabled");
             Kraken.Chat.OpenChat();
@@ -317,7 +317,7 @@ Kraken.Chat = {
 
             if (Kraken.Chat.Client && Kraken.Chat.Client.connected && (Kraken.Chat.Client.myself == Kraken.Username)) {
                 var msg = Kraken.Chat.Elements.ChatMessageText.value;
-                if (msg && msg != "") {                    
+                if (msg && msg != "") {
                     Kraken.Chat.Client.say(Kraken.CurrentStream, msg).then(function () {
                         Kraken.Chat.Elements.ChatMessageText.value = "";
                     });
@@ -353,4 +353,4 @@ Kraken.Chat = {
         }
 
     }
-}
+};

@@ -3,7 +3,7 @@
 
 Kraken.Player = {
 
-    Skin: { 
+    Skin: {
         toolbar: {
             colors: {
                 volume: {

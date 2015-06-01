@@ -4,7 +4,7 @@
 Kraken.API = {
 
     GetUser: function () {
-        
+
         Kraken.Utils.GetJSONP(Kraken.URL.APIBase + "kraken/users/" + Kraken.Username + "/follows/channels?limit=100", function (data) {
 
             if (data.error) {
@@ -15,7 +15,7 @@ Kraken.API = {
             else if (data.follows.length == 0) {
                 Kraken.Utils.DisplayError("User is not currently following any channels");
             }
-            else if(data.follows) {
+            else if (data.follows) {
                 Kraken.Streams = data.follows;
                 Kraken.FollowingCount = data._total;
                 Kraken.API.GetOnlineData();
@@ -32,7 +32,7 @@ Kraken.API = {
 
         var query = Kraken.Utils.GetChannelString();
 
-        Kraken.Utils.GetJSONP(Kraken.URL.APIBase + "kraken/streams/" + query, function(data) {
+        Kraken.Utils.GetJSONP(Kraken.URL.APIBase + "kraken/streams/" + query, function (data) {
 
             if (!data.streams) {
                 Kraken.Utils.DisplayError("Could not retrieve channel stream data from the Twitch API.");
