@@ -18,7 +18,7 @@ Kraken.Player = {
         wjs("#webchimera").skin(Kraken.Player.Skin);
     },
 
-    OpenStream: function (url) {
+    OpenStream: function (hls) {
 
         if (!wjs("#webchimera").plugin) {
             Kraken.Player.CreatePlayer();
@@ -36,7 +36,10 @@ Kraken.Player = {
         wjs("#webchimera").setOpeningText(title);
         wjs("#webchimera").stopPlayer();
         wjs("#webchimera").plugin.playlist.clear();
-        wjs("#webchimera").addPlaylist(url);
+        wjs("#webchimera").addPlaylist({
+            url: hls,
+            vlcArgs: "--sout-livehttp-caching --sout-livehttp-ratecontrol"
+        });
         wjs("#webchimera").plugin.playlist.next();
 
     },
