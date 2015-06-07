@@ -14,7 +14,7 @@ Rectangle {
 	// If Playlist is Open Show Top Text
 	Text {
 		id: openingtext
-		visible: playlistblock.visible === true || subMenublock.visible === true ? true : false
+		visible: settings.playlistmenu === true || settings.subtitlemenu === true ? true : false
 		anchors.top: parent.top
 		anchors.topMargin: 10
 		anchors.horizontalCenter: parent.horizontalCenter

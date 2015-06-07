@@ -65,10 +65,7 @@ Rectangle {
 			'closePlaylist': "\ue896",
 			
 			// Settings Button (for advanced playlist feature)
-			'settings': "\ue801",
-			
-			// Picture in Picture Button (playlist menu)
-			'pip': "\ue800"
+			'settings': "\ue801"
 			
 		},
 		

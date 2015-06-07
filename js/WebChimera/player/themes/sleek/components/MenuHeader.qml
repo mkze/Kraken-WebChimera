@@ -25,7 +25,6 @@ Rectangle {
 			anchors.leftMargin: 12
 			font.pointSize: 10
 		}
-		MouseArea { hoverEnabled: true; anchors.fill: parent; }
 	}
 	// End Top "Title" text Holder
 }
