@@ -14,7 +14,7 @@ Kraken.Player = {
     },
 
     CreatePlayer: function () {
-        wjs("#playerContainer").addPlayer({ id: "webchimera", autoplay: 1, theme: "sleek", buffer: 8000 });
+        wjs("#playerContainer").addPlayer({ id: "webchimera", autoplay: 1, theme: "sleek", buffer: 10000 });
         wjs("#webchimera").skin(Kraken.Player.Skin);
     },
 
@@ -47,10 +47,8 @@ Kraken.Player = {
     IsPlaying: function () {
 
         try {
-            if (wjs("#webchimera").plugin.playlist.isPlaying)
-                return true;
-            else
-                return false;
+            var state = wjs("#webchimera").plugin.playlist.isPlaying;
+            return state;
         } catch (e) {
             return false;
         }
