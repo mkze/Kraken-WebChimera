@@ -19,13 +19,17 @@ Rectangle {
 	color: "transparent"
 	visible: settings.uiVisible == 0 ? false : settings.toolbar == 0 ? false : true
 	
+	property var checkWheel: false;
+	property var lastTimestamp: 0;
+	property var lastCalc: 0;
+	
 	RowLayout {
 		id: rowLayer
 		anchors.left: parent.left
 		anchors.right: parent.right
 		anchors.bottom: parent.bottom
 		anchors.bottomMargin: settings.multiscreen == 1 ? fullscreen ? 32 : -8 : fullscreen ? 32 : mousesurface.containsMouse ? 30 : 0 // Multiscreen - Edit
-		opacity: settings.multiscreen == 1 ? fullscreen ? fullscreen ? settings.ismoving > 5 ? 0 : 1 : 1 : 0 : fullscreen ? settings.ismoving > 5 ? 0 : 1 : 1 // Multiscreen - Edit
+		opacity: settings.multiscreen == 1 ? fullscreen ? settings.ismoving > 5 ? 0 : 1 : 0 : fullscreen ? settings.ismoving > 5 ? 0 : 1 : 1 // Multiscreen - Edit
 		Behavior on anchors.bottomMargin {
 			PropertyAnimation {
 				id: effect
@@ -43,6 +47,30 @@ Rectangle {
 			onPressed: root.pressed(mouse.x,mouse.y);
 			onPositionChanged: root.changed(mouse.x,mouse.y);
 			onReleased: root.released(mouse.x,mouse.y);
+			onWheel: {
+				settings.newProgress = (vlcPlayer.time + lastCalc) / wjs.getLength();
+				settings = settings;
+				if (vlcPlayer.playing) vlcPlayer.togglePause();
+				lastTimestamp = Date.now();
+				checkWheel = true;
+				if (wjs.getLength() > 0) var newDif = Math.floor(wjs.getLength() /100);
+				else var newDif = 30000;
+
+				if (wheel.angleDelta.y > 0) lastCalc = lastCalc +newDif;
+				if (wheel.angleDelta.y < 0) lastCalc = lastCalc + (newDif * (-1));
+				
+			}
+		}
+		Timer {
+			interval: 1010; running: checkWheel ? true : false; repeat: true
+			onTriggered: {
+				if (lastTimestamp + 1000 < Date.now()) {
+					checkWheel = false;
+					if (!vlcPlayer.playing) vlcPlayer.togglePause();
+					vlcPlayer.time = wjs.getLength() * settings.newProgress;
+					lastCalc = 0;
+				}
+			}
 		}
 		Rectangle {
 			id: progressBackground
